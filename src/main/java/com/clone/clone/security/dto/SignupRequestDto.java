@@ -10,5 +10,5 @@ public class SignupRequestDto {
     private String username;
     private String password;
     private String email;
-    private boolean marketing;
+    private boolean marketing;  //마케팅 약관
 }

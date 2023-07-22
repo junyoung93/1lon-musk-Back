@@ -22,7 +22,9 @@ public class UserService {
 
     private final JwtUtil jwtUtil;
 
+    //사용자로부터 회원 가입 요청 정보를 담은 DTO를 인자로 받아 처리합니다.
     public ResponseEntity<?> signup(SignupRequestDto requestDto){
+        //정보 가져옴
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
         String email = requestDto.getEmail();
@@ -46,6 +48,7 @@ public class UserService {
         String token = jwtUtil.createToken(email);
         ToekenResponseDto toekenResponseDto = new ToekenResponseDto(token);
 
+        //Jackson에 의해 자동으로 json형태로 나감.
         return ResponseEntity.ok(toekenResponseDto);
     }
 
@@ -65,11 +68,10 @@ public class UserService {
         }
 
         //Jwt 생성 및 바디로 전송할 Response 객체로 추가
-        String token = jwtUtil.createToken(user.getEmail());
-        jwtUtil.addJwtBody(token,response);
-
-        ToekenResponseDto toekenResponseDto = new ToekenResponseDto(token);
-        return ResponseEntity.ok(toekenResponseDto);
+        String token = jwtUtil.createToken(email);
+        // 처음에 여기서 json으로 응답이 가지 않고 바로 클라이언트로 갔음.
+        // 그래서 응답 본문에 넣고 싶어 JwtAuthenticationFilter의 successfulAuthentication를 수정함.
+        return jwtUtil.addJwtBody(token,response);
     }
 
 }

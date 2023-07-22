@@ -8,7 +8,7 @@ import lombok.Setter;
 import java.util.ArrayList;
 import java.util.List;
 
-//git branch
+
 @Getter
 @Entity
 @Setter
@@ -26,6 +26,13 @@ public class User {
 
     @Column(nullable = false)
     private String password;
+
+    @Column(nullable = false, unique = true)
+    private String email;
+
+    @Column(name = "marketing", nullable = false)
+    private boolean marketing;
+
 
 
 

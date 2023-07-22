@@ -69,7 +69,6 @@ public class UserService {
         jwtUtil.addJwtBody(token,response);
 
         ToekenResponseDto toekenResponseDto = new ToekenResponseDto(token);
-
         return ResponseEntity.ok(toekenResponseDto);
     }
 

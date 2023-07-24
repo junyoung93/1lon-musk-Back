@@ -48,7 +48,7 @@ public class UserService {
 
 
         //user repo에 저장
-        User user = new User(username, password, email);
+        User user = new User(username, password, email,marketing);
         userRepository.save(user);
 
         String token = jwtUtil.createToken(email);
@@ -79,6 +79,7 @@ public class UserService {
 
         //Jwt 생성 및 바디로 전송할 Response 객체로 추가
         String token = jwtUtil.createToken(email);
+
         // 처음에 여기서 json으로 응답이 가지 않고 바로 클라이언트로 갔음.
         // 그래서 응답 본문에 넣고 싶어 JwtAuthenticationFilter의 successfulAuthentication를 수정함.
         return jwtUtil.addJwtBody(token,response);

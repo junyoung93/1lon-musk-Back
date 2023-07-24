@@ -4,6 +4,9 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.springframework.cglib.core.Local;
+
+import java.time.LocalDateTime;
 
 
 @Getter
@@ -11,7 +14,7 @@ import lombok.Setter;
 @Setter
 @Table(name = "users")
 @NoArgsConstructor
-public class User {
+public class User extends Timestamped {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,9 +34,10 @@ public class User {
     private boolean marketing;
 
 
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email, boolean marketing) {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.marketing=marketing;
     }
 }

@@ -65,6 +65,10 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         String token = jwtUtil.createToken(username);
         token = jwtUtil.substringToken(token);
+
+        String refreshToken = jwtUtil.createRefreshToken();
+        jwtUtil.addRefreshTokenCookie(refreshToken, response);
+
 //        log.info(token);
         log.info("로그인 성공!!");
 

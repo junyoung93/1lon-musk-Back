@@ -4,6 +4,7 @@ import com.clone.clone.security.dto.ToekenResponseDto;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -46,7 +47,14 @@ public class JwtUtil {
     // 토큰 만료시간
     long minute = 60*1000L;
     long hour = 60*minute;
-    private final long TOKEN_TIME = hour;       //1시간
+
+    //accesToken 생명 주기
+    private final long ACCESSTOKEN_TIME = 10*minute;
+
+    //refreshToken 생명 주기
+    private final long REFRESHTOKEN_TIME = hour;
+
+
 
 
     @Value("${jwt.secret.key}")
@@ -66,15 +74,46 @@ public class JwtUtil {
 
     //토큰 생성
     public String createToken(String username) {
-        log.info("토큰 생성");
+        log.info("access 토큰 생성");
         Date date = new Date();	//현재 날짜 시간
         return BEARER_PREFIX +
                 Jwts.builder()
                         .setSubject(username)
-                        .setExpiration(new Date(date.getTime() + TOKEN_TIME))
+                        .setExpiration(new Date(date.getTime() + ACCESSTOKEN_TIME))
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm)
                         .compact();     //마무리
+    }
+
+    // refresh 토큰 생성
+    public String createRefreshToken() {
+        log.info("refresh 토큰 생성");
+        Date date = new Date();	//현재 날짜 시간
+        return BEARER_PREFIX +
+                Jwts.builder()
+//                        .setSubject(username)
+                        .setExpiration(new Date(date.getTime() + REFRESHTOKEN_TIME))
+                        .setIssuedAt(date) // 발급일
+                        .signWith(key, signatureAlgorithm)
+                        .compact();     //마무리
+    }
+
+    // refresh 토큰 쿠키에 저장
+    public void addRefreshTokenCookie(String token, HttpServletResponse res){
+        try {
+            token =  URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+
+            //쿠키 생성
+            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
+            log.info("refresh 토큰 쿠키에 저장");
+
+            //쿠키 유효 경로 설정
+            cookie.setPath("/");
+            res.addCookie(cookie);
+
+        } catch (UnsupportedEncodingException e){
+            log.error(e.getMessage());
+        }
     }
 
 

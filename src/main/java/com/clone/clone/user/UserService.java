@@ -2,15 +2,23 @@ package com.clone.clone.user;
 
 import com.clone.clone.security.dto.LoginRequestDto;
 import com.clone.clone.security.dto.SignupRequestDto;
+import com.clone.clone.security.dto.StatusMessageDto;
 import com.clone.clone.security.dto.ToekenResponseDto;
 import com.clone.clone.security.jwt.JwtUtil;
 import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.validation.Valid;
+import jdk.jshell.spi.ExecutionControl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.validator.routines.EmailValidator;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Optional;
 
@@ -25,27 +33,36 @@ public class UserService {
     private final JwtUtil jwtUtil;
 
     //사용자로부터 회원 가입 요청 정보를 담은 DTO를 인자로 받아 처리합니다.
-    public ResponseEntity<?> signup(SignupRequestDto requestDto){
+    @Transactional
+    public ResponseEntity<?> signup(@Valid SignupRequestDto requestDto) throws SignExeption{
         //정보 가져옴
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());
         String email = requestDto.getEmail();
         boolean marketing = requestDto.isMarketing();
 
+        //메일, 비번 유효성 검사
+        //의존성에 : implementation 'commons-validator:commons-validator:1.7'
+        if(requestDto.getPassword().length()<8 || !EmailValidator.getInstance().isValid(requestDto.getEmail())){
+            throw new SignExeption("E-mail and password have different formats.","auth_001");
+        }
+
         // email 중복 유효성 검사
         Optional<User> checkEmail = userRepository.findByEmail(email);
         if(checkEmail.isPresent()){
-            throw new IllegalArgumentException("중복된 email");
+            throw new SignExeption("E-mail and password have different formats.","auth_001");
         }
         log.info("email 중복 체크 완료");
 
+        if(requestDto.getEmail().isEmpty() || requestDto.getPassword().isEmpty()){
+            throw new SignExeption("Nullable=false","auth_002");
+        }
 
         // 마켓팅 수집 동의 여부 약관 유효성 검사
         if(!marketing){
-            throw new IllegalArgumentException("마케팅 약관에 동의 해주세요");
+            throw new SignExeption("E-mail and password have different formats.","auth_001");
         }
         log.info("마켓팅 동의 수집 여부 확인 (=true)");
-
 
         //user repo에 저장
         User user = new User(username, password, email,marketing);
@@ -62,7 +79,7 @@ public class UserService {
         return ResponseEntity.ok(toekenResponseDto);
     }
 
-
+    @Transactional
     public ResponseEntity<?> signin(LoginRequestDto requestDto, HttpServletResponse response){
         String email =requestDto.getEmail();
         String passowrd = requestDto.getPassword();
@@ -84,5 +101,7 @@ public class UserService {
         // 그래서 응답 본문에 넣고 싶어 JwtAuthenticationFilter의 successfulAuthentication를 수정함.
         return jwtUtil.addJwtBody(token,response);
     }
+
+
 
 }

@@ -1,6 +1,9 @@
 package com.clone.clone.user;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -10,8 +13,9 @@ import java.time.LocalDateTime;
 
 
 @Getter
-@Entity
 @Setter
+@Entity
+@Valid
 @Table(name = "users")
 @NoArgsConstructor
 public class User extends Timestamped {
@@ -24,9 +28,11 @@ public class User extends Timestamped {
     @Column(nullable = false, unique = true)
     private String username;
 
+    @Size(min=8)
     @Column(nullable = false)
     private String password;
 
+    @Email
     @Column(nullable = false, unique = true)
     private String email;
 

@@ -1,6 +1,7 @@
 package com.clone.clone.security.jwt;
 
 import com.clone.clone.security.dto.ToekenResponseDto;
+import com.clone.clone.user.SignExeption;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -132,7 +133,8 @@ public class JwtUtil {
 
         } catch (UnsupportedEncodingException e){
             logger.error(e.getMessage());
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new SignExeption("Unable to issue access tokens", "auth_003");
         }
     }
 

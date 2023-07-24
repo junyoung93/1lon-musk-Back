@@ -64,7 +64,9 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         String token = jwtUtil.createToken(username);
-
+        token = jwtUtil.substringToken(token);
+//        log.info(token);
+        log.info("로그인 성공!!");
 
         //ToekenResponseDto 객체를 생성하고, 이 객체를 JSON 문자열로 변환한 다음, 이 JSON 문자열을 HTTP 응답 바디에 씁니다.
         //ObjectMapper().writeValueAsString 메소드는 객체를 JSON 문자열로 변환하고,

@@ -6,6 +6,7 @@ import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,6 +21,7 @@ import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
     /*
@@ -64,6 +66,7 @@ public class JwtUtil {
 
     //토큰 생성
     public String createToken(String username) {
+        log.info("토큰 생성");
         Date date = new Date();	//현재 날짜 시간
         return BEARER_PREFIX +
                 Jwts.builder()
@@ -78,8 +81,10 @@ public class JwtUtil {
     //토큰을 body에 저장
     public ResponseEntity<ToekenResponseDto> addJwtBody(String token, HttpServletResponse response){
         try {
+            log.info("accessToken 바디에 저장");
             token= URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-
+            log.info(token);
+            log.info("");
             //body에 보낼 ToekenResponse 객체 생성
             ToekenResponseDto toekenResponseDto = new ToekenResponseDto(token);
 
@@ -95,6 +100,7 @@ public class JwtUtil {
     // JWT 토큰 substring
     public String substringToken(String tokenValue) {
         if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
+            log.info("bearer 제거");
             return tokenValue.substring(7);
         }
         logger.error("Not Found Token");
@@ -104,6 +110,7 @@ public class JwtUtil {
 
     public boolean validateToken(String token) {
         try {
+            log.info("유효성 검사 통과");
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
@@ -120,6 +127,7 @@ public class JwtUtil {
 
     // 토큰에서 사용자 정보 가져오기
     public Claims getUserInfoFromToken(String token) {
+        log.info("유저 정보 전달 완료");
         return Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
     }
 

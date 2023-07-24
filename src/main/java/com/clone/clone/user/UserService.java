@@ -7,12 +7,14 @@ import com.clone.clone.security.jwt.JwtUtil;
 import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -35,19 +37,27 @@ public class UserService {
         if(checkEmail.isPresent()){
             throw new IllegalArgumentException("중복된 email");
         }
+        log.info("email 중복 체크 완료");
+
 
         // 마켓팅 수집 동의 여부 약관 유효성 검사
         if(!marketing){
             throw new IllegalArgumentException("마케팅 약관에 동의 해주세요");
         }
+        log.info("마켓팅 동의 수집 여부 확인 (=true)");
+
 
         //user repo에 저장
         User user = new User(username, password, email);
         userRepository.save(user);
 
         String token = jwtUtil.createToken(email);
+        token = jwtUtil.substringToken(token);
+
         ToekenResponseDto toekenResponseDto = new ToekenResponseDto(token);
 
+
+        log.info("회원 가입 완료");
         //Jackson에 의해 자동으로 json형태로 나감.
         return ResponseEntity.ok(toekenResponseDto);
     }

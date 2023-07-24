@@ -1,4 +1,4 @@
-package com.clone.clone.user;
+package com.clone.clone.security.ExceptionHandler;
 
 public class SignExeption extends RuntimeException{
     private String error;

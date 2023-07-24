@@ -1,24 +1,19 @@
 package com.clone.clone.user;
 
+import com.clone.clone.security.ExceptionHandler.SignExeption;
 import com.clone.clone.security.dto.LoginRequestDto;
 import com.clone.clone.security.dto.SignupRequestDto;
-import com.clone.clone.security.dto.StatusMessageDto;
 import com.clone.clone.security.dto.ToekenResponseDto;
 import com.clone.clone.security.jwt.JwtUtil;
-import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import jdk.jshell.spi.ExecutionControl;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.util.Optional;
 
@@ -34,7 +29,7 @@ public class UserService {
 
     //사용자로부터 회원 가입 요청 정보를 담은 DTO를 인자로 받아 처리합니다.
     @Transactional
-    public ResponseEntity<?> signup(@Valid SignupRequestDto requestDto) throws SignExeption{
+    public ResponseEntity<?> signup(@Valid SignupRequestDto requestDto) throws SignExeption {
         //정보 가져옴
         String username = requestDto.getUsername();
         String password = passwordEncoder.encode(requestDto.getPassword());

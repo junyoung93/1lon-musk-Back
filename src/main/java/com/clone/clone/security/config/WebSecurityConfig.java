@@ -2,8 +2,8 @@ package com.clone.clone.security.config;
 
 
 import com.clone.clone.security.UserDetailsServiceImpl;
-import com.clone.clone.security.jwt.JwtAuthenticationFilter;
-import com.clone.clone.security.jwt.JwtAuthorizationFilter;
+import com.clone.clone.security.filter.JwtAuthenticationFilter;
+import com.clone.clone.security.filter.JwtAuthorizationFilter;
 import com.clone.clone.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;

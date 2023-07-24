@@ -1,4 +1,4 @@
-package com.clone.clone.security.jwt;
+package com.clone.clone.security.filter;
 
 import com.clone.clone.security.UserDetailsServiceImpl;
 import com.clone.clone.security.jwt.JwtUtil;

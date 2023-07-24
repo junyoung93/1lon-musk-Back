@@ -1,5 +1,6 @@
 package com.clone.clone.security.filter;
 
+import com.clone.clone.security.ExceptionHandler.LoginFailHandler;
 import com.clone.clone.security.UserDetailsImpl;
 import com.clone.clone.security.dto.LoginRequestDto;
 import com.clone.clone.security.dto.ToekenResponseDto;
@@ -9,14 +10,20 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.neo4j.Neo4jProperties;
+import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 // Jwt를 이용한 이증
 @Slf4j(topic = "로그인 및 JWT 생성")  //로그명
@@ -26,7 +33,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
     public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
-        setFilterProcessesUrl("/signin");   //필터가 처리할 요청 URL을 "/signin"으로 설정
+        setFilterProcessesUrl("/api/signin");   //필터가 처리할 요청 URL을 "/signin"으로 설정
+        setAuthenticationFailureHandler(new LoginFailHandler());
     }
 
 
@@ -70,7 +78,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtUtil.createRefreshToken();
         jwtUtil.addRefreshTokenCookie(refreshToken, response);
 
-//        log.info(token);
         log.info("로그인 성공!!");
 
         //ToekenResponseDto 객체를 생성하고, 이 객체를 JSON 문자열로 변환한 다음, 이 JSON 문자열을 HTTP 응답 바디에 씁니다.
@@ -79,11 +86,5 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.getWriter().write(new ObjectMapper().writeValueAsString(new ToekenResponseDto(token)));
         response.setContentType("application/json");        //application/json 타입으로
         response.setStatus(HttpServletResponse.SC_OK);      //응답 바디 json으로
-    }
-
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response, AuthenticationException failed) throws IOException, ServletException {
-        log.info("로그인 실패");
-        response.setStatus(401);
     }
 }

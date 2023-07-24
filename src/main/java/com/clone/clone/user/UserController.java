@@ -9,8 +9,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
+@RequestMapping("/api")
+
 public class UserController {
 
     private final UserService userService;
@@ -26,5 +28,7 @@ public class UserController {
     public ResponseEntity<?> signin(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse res){
         return userService.signin(loginRequestDto,res);
     }
+
+
 
 }

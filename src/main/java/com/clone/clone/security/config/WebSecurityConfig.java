@@ -58,18 +58,18 @@ public class WebSecurityConfig {
                 );
 
         // 로그인
-        http.formLogin((formLogin)->
-                formLogin
-                        //로그인 View
-                        .loginPage("/signin")
-                        //로그인 처리 POST /api/signin
-                        .loginProcessingUrl("/api/signin")
-                        // 로그인 성공 후 url -> 메인 페이지로
-                        .defaultSuccessUrl("/")
-                        // 로그인 실패시 url -> 로그인 페이지로 보냅니다. 쿼리 형태 ?error는 붙히지 않았음.
-                        .failureUrl("/signin")
-                        .permitAll()
-                );
+//        http.formLogin((formLogin)->
+//                formLogin
+//                        //로그인 View
+////                        .loginPage("/signin")
+//                        //로그인 처리 POST /api/signin
+//                        .loginProcessingUrl("/api/signin")
+//                        // 로그인 성공 후 url -> 메인 페이지로
+//                        .defaultSuccessUrl("/")
+//                        // 로그인 실패시 url -> 로그인 페이지로 보냅니다. 쿼리 형태 ?error는 붙히지 않았음.
+//                        .failureUrl("/signin")
+//                        .permitAll()
+//                );
         return http.build();    //HttpSecurity 객체를 빌드 하고 반환합니다.
     }
 

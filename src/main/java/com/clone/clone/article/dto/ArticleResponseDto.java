@@ -1,10 +1,8 @@
-package com.clone.clone.article.responsedto;
+package com.clone.clone.article.dto;
 
-import com.clone.clone.article.Article;
+import com.clone.clone.article.entity.Article;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -14,7 +12,7 @@ public class ArticleResponseDto {
     private String content;
     private String image_url;
     private String category;
-    private LocalDateTime articleDate;
+    private String date;
 
 
 
@@ -24,6 +22,6 @@ public class ArticleResponseDto {
         this.content=article.getContent();
         this.image_url=article.getImage_url();
         this.category=article.getCategory();
-        this.articleDate=article.getArticleDate();
+        this.date=article.getDate();
     }
 }

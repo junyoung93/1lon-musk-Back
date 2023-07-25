@@ -1,6 +1,7 @@
 package com.clone.clone.search;
 
 import com.clone.clone.article.Article;
+import com.clone.clone.article.repository.ArticleRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;

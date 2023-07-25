@@ -1,7 +1,5 @@
 package com.clone.clone.security.jwt;
 
-import com.clone.clone.security.dto.ToekenResponseDto;
-import com.clone.clone.security.ExceptionHandler.SignExeption;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
@@ -12,12 +10,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Base64;
 import java.util.Date;
@@ -36,13 +35,15 @@ public class JwtUtil {
     (7) jwt에서 사용자 정보를 가져오기
     */
 
-    public static final String AUTHORIZATION_HEADER = "Authorization";
+    public static final String AUTHORIZATION_HEADER = "AccessToken";
 
+    public static final String REFRESH_HEADER = "RefreshToken";
     // 사용자 권한 값의 KEY / 권한 정보를 토크에 저장할 때 사용하는 키
     public static final String AUTHORIZATION_KEY = "auth";
 
     // Token 식별자. 말그대로 JWT를 식별하는 접두사입니다
     public static final String BEARER_PREFIX = "Bearer ";  //bearer 규칙(공백 필수)
+    public static final String COOKIE_PREFIX = "Bearer%20";
 
     // 토큰 만료시간
     long minute = 60*1000L;
@@ -104,7 +105,7 @@ public class JwtUtil {
             token =  URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
 
             //쿠키 생성
-            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
+            Cookie cookie = new Cookie(REFRESH_HEADER, token);
             log.info("refresh 토큰 쿠키에 저장");
 
             //쿠키 유효 경로 설정
@@ -133,35 +134,17 @@ public class JwtUtil {
         }
     }
 
-    //토큰을 body에 저장
-    public ResponseEntity<ToekenResponseDto> addJwtBody(String token, HttpServletResponse response){
-        try {
-            log.info("accessToken 바디에 저장");
-            token= URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-            log.info(token);
-            log.info("");
-            //body에 보낼 ToekenResponse 객체 생성
-            ToekenResponseDto toekenResponseDto = new ToekenResponseDto(token);
-
-            // Response 객체에 body 추가
-            return ResponseEntity.ok(toekenResponseDto);
-
-        } catch (UnsupportedEncodingException e){
-            logger.error(e.getMessage());
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
-            throw new SignExeption("Unable to issue access tokens", "auth_003");
-        }
-    }
 
     // JWT 토큰 substring
     public String substringToken(String tokenValue) {
-        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PREFIX)) {
+        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(COOKIE_PREFIX)) {
             log.info("bearer 제거");
-            return tokenValue.substring(7);
+            return tokenValue.substring(COOKIE_PREFIX.length());
         }
         logger.error("Not Found Token");
         throw new NullPointerException("Not Found Token");
     }
+
 
 
     public boolean validateToken(String token) {
@@ -188,11 +171,55 @@ public class JwtUtil {
     }
 
 
-    public String getTokenFromRequest(HttpServletRequest req) {
-        String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
-            return bearerToken.substring(7);
+//    public String getTokenFromRequest(HttpServletRequest req) {
+//        String bearerToken = req.getHeader(AUTHORIZATION_HEADER);
+//        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+//            return bearerToken.substring(7);
+//        }
+//        return null;
+//    }
+
+    public String getTokenFromCookie(HttpServletRequest req) {
+        Cookie[] cookies = req.getCookies();
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("AccessToken")) { // 쿠키 이름에 따라 변경
+                    return cookie.getValue();
+                }
+            }
+        return null;
+    }
+
+    public String getRefreshTokenFromCookies(HttpServletRequest request) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("RefreshToken".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
         }
         return null;
     }
+
+
+
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+//        String refreshToken = getRefreshTokenFromCookies(request);
+//        if (refreshToken != null && validateToken(refreshToken)) {
+//            String username = getUserInfoFromToken(refreshToken).getSubject();
+//            String newAccessToken = createToken(username);
+//
+//            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, newAccessToken);
+//            log.info("refresh 토큰 발급");
+//
+//            cookie.setPath("/");
+//            response.addCookie(cookie);
+//        } else {
+//
+//        }
+    }
+
+
+
+
 }

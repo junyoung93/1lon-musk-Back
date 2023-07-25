@@ -52,10 +52,12 @@ public class WebSecurityConfig {
                         // requestMatchers: 특정 HTTP 요청을 매칭
                         // PathRequest.toStaticResources().atCommonLocations() : 정적 자원에 대한 요청(CSS, JS, image 등)
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        
                         .requestMatchers("/**").permitAll()
                         .anyRequest().authenticated()       //anyRequest:모든 요청에 대해 적용할 규칙 적용.
                         //authenticated(): 사용자만 해당 요청 가능
                 );
+
 
         // 로그인
 //        http.formLogin((formLogin)->

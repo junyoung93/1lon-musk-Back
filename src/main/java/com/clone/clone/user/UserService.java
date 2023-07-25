@@ -6,6 +6,8 @@ import com.clone.clone.security.dto.SignResponseDto;
 import com.clone.clone.security.dto.SignupRequestDto;
 import com.clone.clone.security.dto.ToekenResponseDto;
 import com.clone.clone.security.jwt.JwtUtil;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +30,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     private final JwtUtil jwtUtil;
+
 
     //사용자로부터 회원 가입 요청 정보를 담은 DTO를 인자로 받아 처리합니다.
     @Transactional
@@ -76,23 +79,27 @@ public class UserService {
         return ResponseEntity.ok(toekenResponseDto);
     }
 
-    @Transactional
-    public SignResponseDto signin(LoginRequestDto requestDto){
-        String email =requestDto.getEmail();
-        String passowrd = requestDto.getPassword();
+//    @Transactional
+//    public SignResponseDto signin(LoginRequestDto requestDto){
+//        String email =requestDto.getEmail();
+//        String passowrd = requestDto.getPassword();
+//
+//        //사용자 확인
+//        User user = userRepository.findByEmail(email).orElseThrow(
+//                ()-> new IllegalArgumentException("등록된 이메일이 없습니다.")
+//                );
+//
+//        //비밀번호 유효성 검사
+//        if(!passwordEncoder.matches(passowrd, user.getPassword())){
+//            throw new IllegalArgumentException("비밀번호 불일치");
+//        }
+//
+//        return new SignResponseDto(HttpStatus.OK.value());
+//    }
+//
+//
+//
 
-        //사용자 확인
-        User user = userRepository.findByEmail(email).orElseThrow(
-                ()-> new IllegalArgumentException("등록된 이메일이 없습니다.")
-                );
-
-        //비밀번호 유효성 검사
-        if(!passwordEncoder.matches(passowrd, user.getPassword())){
-            throw new IllegalArgumentException("비밀번호 불일치");
-        }
-
-        return new SignResponseDto(HttpStatus.OK.value());
-    }
 
 
 

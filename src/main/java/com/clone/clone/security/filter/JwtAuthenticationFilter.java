@@ -55,7 +55,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             return getAuthenticationManager().authenticate( //AuthenticationManager의 authenticate 인증 시작
                     //AuthenticationManager는 ProviderManager을 구현하여 사용 되며
                     //이는 등록된 AuthenticationProvider를 순회합니다.
-
                     //UsernamePasswordAuthenticationToken객체를 생성
                     new UsernamePasswordAuthenticationToken(
                             requestDto.getEmail(),
@@ -75,11 +74,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         log.info("로그인 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         String token = jwtUtil.createToken(username);
-        token = jwtUtil.substringToken(token);
         jwtUtil.addAccessTokenCookie(token,response);
 
         String refreshToken = jwtUtil.createRefreshToken();
         jwtUtil.addRefreshTokenCookie(refreshToken, response);
+
         log.info("로그인 성공!!");
     }
 }

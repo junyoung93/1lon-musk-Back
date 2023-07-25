@@ -5,6 +5,7 @@ import com.clone.clone.security.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -17,10 +18,12 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 @Slf4j(topic = "JWT 검증 및 인가")
 public class JwtAuthorizationFilter extends OncePerRequestFilter {
 
+    public static final String AUTHORIZATION_HEADER = "AccessToken";
     private final JwtUtil jwtUtil;
     private final UserDetailsServiceImpl userDetailsService;
 
@@ -30,17 +33,28 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest requset, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
-        String tokenValue = jwtUtil.getTokenFromRequest(requset);
+        String tokenValue = jwtUtil.getTokenFromCookie(request);
+        String refreshToken = jwtUtil.getRefreshTokenFromCookies(request);
+        refreshToken=jwtUtil.substringToken(refreshToken);
+        tokenValue=jwtUtil.substringToken(tokenValue);
+        log.info(refreshToken);
 
         if (StringUtils.hasText(tokenValue)) {
             // JWT 토큰 substring
-            tokenValue = jwtUtil.substringToken(tokenValue);
             log.info(tokenValue);
-
             if (!jwtUtil.validateToken(tokenValue)) {
-                log.error("Token Error");
+                if (refreshToken != null && jwtUtil.validateToken(refreshToken)) {
+                    String username = jwtUtil.getUserInfoFromToken(refreshToken).getSubject();
+                    String newAccessToken = jwtUtil.createToken(username);
+                    newAccessToken =  URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
+                    Cookie cookie = new Cookie(AUTHORIZATION_HEADER, newAccessToken);
+                    log.info("refresh 토큰 발급");
+                    log.info(newAccessToken);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
                 return;
             }
 
@@ -54,7 +68,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             }
         }
 
-        filterChain.doFilter(requset, response);
+        filterChain.doFilter(request, response);
     }
 
     // 인증 처리

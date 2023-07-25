@@ -1,6 +1,6 @@
 package com.clone.clone.security.ExceptionHandler;
 
-import com.clone.clone.security.dto.StatusMessageDto;
+import com.clone.clone.user.dto.StatusMessageDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

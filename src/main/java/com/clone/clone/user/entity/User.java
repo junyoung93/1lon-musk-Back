@@ -1,4 +1,4 @@
-package com.clone.clone.user;
+package com.clone.clone.user.entity;
 
 import jakarta.persistence.*;
 import jakarta.validation.Valid;
@@ -7,10 +7,6 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.springframework.cglib.core.Local;
-
-import java.time.LocalDateTime;
-
 
 @Getter
 @Setter
@@ -28,7 +24,7 @@ public class User extends Timestamped {
     @Column(nullable = false, unique = true)
     private String username;
 
-    @Size(min=8)
+    @Size(min = 8)
     @Column(nullable = false)
     private String password;
 
@@ -44,6 +40,6 @@ public class User extends Timestamped {
         this.username = username;
         this.password = password;
         this.email = email;
-        this.marketing=marketing;
+        this.marketing = marketing;
     }
 }

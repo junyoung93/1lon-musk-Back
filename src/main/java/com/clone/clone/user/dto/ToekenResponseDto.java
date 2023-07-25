@@ -1,4 +1,4 @@
-package com.clone.clone.security.dto;
+package com.clone.clone.user.dto;
 
 import lombok.Getter;
 import lombok.Setter;

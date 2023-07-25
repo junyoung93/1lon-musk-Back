@@ -1,4 +1,4 @@
-package com.clone.clone.user;
+package com.clone.clone.user.entity;
 
 
 import jakarta.persistence.*;
@@ -25,14 +25,14 @@ public abstract class Timestamped {
     private LocalDateTime modifiedAt;
 
     @PrePersist
-    public void prePersist(){
+    public void prePersist() {
         LocalDateTime now = LocalDateTime.now();
-        this.createdAt=now;
-        this.modifiedAt=now;
+        this.createdAt = now;
+        this.modifiedAt = now;
     }
 
     @PreUpdate
-    public void preUpdate(){
+    public void preUpdate() {
         this.modifiedAt = LocalDateTime.now();
     }
 }

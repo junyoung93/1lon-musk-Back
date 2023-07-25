@@ -1,6 +1,6 @@
 package com.clone.clone.security.ExceptionHandler;
 
-import com.clone.clone.security.dto.StatusMessageDto;
+import com.clone.clone.user.dto.StatusMessageDto;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;

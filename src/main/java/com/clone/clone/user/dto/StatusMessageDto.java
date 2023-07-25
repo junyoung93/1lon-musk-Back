@@ -1,6 +1,5 @@
-package com.clone.clone.security.dto;
+package com.clone.clone.user.dto;
 
-import com.clone.clone.user.Timestamped;
 import lombok.Getter;
 
 import java.time.LocalDateTime;

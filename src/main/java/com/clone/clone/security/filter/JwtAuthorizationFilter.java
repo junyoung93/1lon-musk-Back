@@ -1,6 +1,6 @@
 package com.clone.clone.security.filter;
 
-import com.clone.clone.security.UserDetailsServiceImpl;
+import com.clone.clone.security.impl.UserDetailsServiceImpl;
 import com.clone.clone.security.jwt.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -33,25 +33,22 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
+            throws ServletException, IOException {
 
         String tokenValue = jwtUtil.getTokenFromCookie(request);
         String refreshToken = jwtUtil.getRefreshTokenFromCookies(request);
         refreshToken=jwtUtil.substringToken(refreshToken);
         tokenValue=jwtUtil.substringToken(tokenValue);
-        log.info(refreshToken);
 
         if (StringUtils.hasText(tokenValue)) {
-            // JWT 토큰 substring
-            log.info(tokenValue);
             if (!jwtUtil.validateToken(tokenValue)) {
                 if (refreshToken != null && jwtUtil.validateToken(refreshToken)) {
                     String username = jwtUtil.getUserInfoFromToken(refreshToken).getSubject();
                     String newAccessToken = jwtUtil.createToken(username);
-                    newAccessToken =  URLEncoder.encode(newAccessToken, "utf-8").replaceAll("\\+", "%20");
+                    newAccessToken =  URLEncoder.encode(newAccessToken, "utf-8")
+                            .replaceAll("\\+", "%20");
                     Cookie cookie = new Cookie(AUTHORIZATION_HEADER, newAccessToken);
-                    log.info("refresh 토큰 발급");
-                    log.info(newAccessToken);
                     cookie.setPath("/");
                     response.addCookie(cookie);
                 }

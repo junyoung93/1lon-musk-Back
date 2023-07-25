@@ -16,7 +16,6 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api")
 
 public class UserController {
 
@@ -24,7 +23,7 @@ public class UserController {
 
     //회원가입
     @ResponseBody
-    @PostMapping("/signup")
+    @PostMapping("/api/user/signup")
     public SignResponseDto signup(@RequestBody @Valid SignupRequestDto signupRequestDto, HttpServletResponse response) {
         return userService.signup(signupRequestDto, response);
     }
@@ -37,7 +36,7 @@ public class UserController {
     }
 
     // token 별 별 email, nickname
-    @GetMapping("/{nickname}/token")
+    @GetMapping("/api/user/token")
     public UserResponseDto getTokenInfo(HttpServletRequest request, HttpServletResponse response) {
         return userService.getTokenInfo(request, response);
     }

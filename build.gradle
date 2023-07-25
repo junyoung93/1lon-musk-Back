@@ -27,6 +27,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
 	// javamailsender : 메일 보낼 때 사용
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	// jsoup : html 파싱할 때 -> 크롤링

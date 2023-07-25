@@ -9,7 +9,7 @@ import java.time.LocalDateTime;
 @Setter
 public class SignupRequestDto {
 
-    private String username;
+    private String nickname;
     private String password;
     private String email;
     private boolean marketing;  //마케팅 약관

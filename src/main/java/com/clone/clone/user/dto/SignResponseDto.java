@@ -9,6 +9,6 @@ public class SignResponseDto {
     private int status;
 
     public SignResponseDto(int status) {
-        this.status=status;
+        this.status = status;
     }
 }

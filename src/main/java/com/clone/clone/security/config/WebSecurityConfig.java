@@ -1,9 +1,7 @@
 package com.clone.clone.security.config;
 
 
-import com.clone.clone.security.impl.UserDetailsServiceImpl;
 import com.clone.clone.security.filter.JwtAuthenticationFilter;
-import com.clone.clone.security.filter.JwtAuthorizationFilter;
 import com.clone.clone.security.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -21,7 +19,6 @@ import org.springframework.security.web.SecurityFilterChain;
 public class WebSecurityConfig {
 
     private final JwtUtil jwtUtil;
-    private final UserDetailsServiceImpl userDetailsService;
     private final AuthenticationConfiguration authenticationConfiguration;
 
     @Bean
@@ -36,10 +33,6 @@ public class WebSecurityConfig {
         return filter;
     }
 
-    @Bean
-    public JwtAuthorizationFilter jwtAuthorizationFilter() {
-        return new JwtAuthorizationFilter(jwtUtil, userDetailsService);
-    }
 
     //securityFilterChain
     @Bean
@@ -49,12 +42,13 @@ public class WebSecurityConfig {
 
         // HTTP 요청에 대한 접근 제어를 설정
         http.authorizeHttpRequests((authorizeHttpRequests) ->        //람다식 표현 -> http 요청에 대한 접근 제어를 설정.
-                        authorizeHttpRequests
-                                .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
-                                .requestMatchers("/**").permitAll()
-                                .anyRequest().authenticated()       //anyRequest:모든 요청에 대해 적용할 규칙 적용.
+                authorizeHttpRequests
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
+                        .requestMatchers("/**").permitAll()
+                        .anyRequest().authenticated()       //anyRequest:모든 요청에 대해 적용할 규칙 적용.
         );
         return http.build();    //HttpSecurity 객체를 빌드 하고 반환합니다.
     }
+
 
 }

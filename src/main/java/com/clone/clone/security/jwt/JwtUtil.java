@@ -1,15 +1,22 @@
 package com.clone.clone.security.jwt;
 
+import com.clone.clone.security.impl.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
@@ -21,6 +28,7 @@ import java.util.Date;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtUtil {
 
 
@@ -31,27 +39,22 @@ public class JwtUtil {
     // Token 식별자. 말그대로 JWT를 식별하는 접두사입니다
     public static final String BEARER_PREFIX = "Bearer ";  //bearer 규칙(공백 필수)
     public static final String COOKIE_PREFIX = "Bearer%20";
-
+    // 로그 설정
+    public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
+    private final UserDetailsServiceImpl userDetailsService;
+    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
     // 토큰 만료시간
+    long sec = 1000L;
     long minute = 60 * 1000L;
-    long hour = 60 * minute;
-
     //accesToken 생명 주기
     private final long ACCESSTOKEN_TIME = 10 * minute;
-
+    long hour = 60 * minute;
     //refreshToken 생명 주기
     private final long REFRESHTOKEN_TIME = hour;
-
-
     @Value("${jwt.secret.key}")
 
     private String secretKey;
     private Key key;
-
-    private final SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
-
-    // 로그 설정
-    public static final Logger logger = LoggerFactory.getLogger("JWT 관련 로그");
 
     @PostConstruct
     public void init() {
@@ -171,7 +174,17 @@ public class JwtUtil {
         return null;
     }
 
-    // refreshToken
-    public void refreshToken(HttpServletRequest request, HttpServletResponse response) {
+    public void setAuthentication(String username) {
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        Authentication authentication = createAuthentication(username);
+        context.setAuthentication(authentication);
+
+        SecurityContextHolder.setContext(context);
+    }
+
+    // 인증 객체 생성
+    private Authentication createAuthentication(String username) {
+        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        return new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
     }
 }

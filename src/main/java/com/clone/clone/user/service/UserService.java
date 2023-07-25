@@ -1,19 +1,28 @@
 package com.clone.clone.user.service;
 
 import com.clone.clone.security.ExceptionHandler.SignExeption;
-import com.clone.clone.user.dto.SignupRequestDto;
-import com.clone.clone.user.dto.ToekenResponseDto;
 import com.clone.clone.security.jwt.JwtUtil;
+import com.clone.clone.user.dto.SignResponseDto;
+import com.clone.clone.user.dto.SignupRequestDto;
+import com.clone.clone.user.dto.UserResponseDto;
 import com.clone.clone.user.entity.User;
 import com.clone.clone.user.repository.UserRepository;
+import io.jsonwebtoken.Claims;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.validator.routines.EmailValidator;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.net.URLEncoder;
 import java.util.Optional;
 
 @Slf4j
@@ -29,18 +38,12 @@ public class UserService {
 
     //사용자로부터 회원 가입 요청 정보를 담은 DTO를 인자로 받아 처리합니다.
     @Transactional
-    public ResponseEntity<?> signup(@Valid SignupRequestDto requestDto) throws SignExeption {
+    public SignResponseDto signup(@Valid SignupRequestDto requestDto, HttpServletResponse response) throws SignExeption {
         //정보 가져옴
-        String username = requestDto.getUsername();
+        String nickname = requestDto.getNickname();
         String password = passwordEncoder.encode(requestDto.getPassword());
         String email = requestDto.getEmail();
         boolean marketing = requestDto.isMarketing();
-
-        //메일, 비번 유효성 검사
-        //의존성에 : implementation 'commons-validator:commons-validator:1.7'
-        if (requestDto.getPassword().length() < 8 || !EmailValidator.getInstance().isValid(requestDto.getEmail())) {
-            throw new SignExeption("E-mail and password have different formats.", "auth_001");
-        }
 
         // email 중복 유효성 검사
         Optional<User> checkEmail = userRepository.findByEmail(email);
@@ -59,15 +62,70 @@ public class UserService {
         log.info("마켓팅 동의 수집 여부 확인 (=true)");
 
         //user repo에 저장
-        User user = new User(username, password, email, marketing);
+        User user = new User(nickname, password, email, marketing);
         userRepository.save(user);
 
         String token = jwtUtil.createToken(email);
-        token = jwtUtil.substringToken(token);
+        jwtUtil.addAccessTokenCookie(token, response);
 
-        ToekenResponseDto toekenResponseDto = new ToekenResponseDto(token);
+        String refreshToken = jwtUtil.createRefreshToken();
+        jwtUtil.addRefreshTokenCookie(refreshToken, response);
 
         //Jackson에 의해 자동으로 json형태로 나감.
-        return ResponseEntity.ok(toekenResponseDto);
+        return new SignResponseDto(HttpStatus.OK.value());
+    }
+
+    //refresh token
+    @Transactional
+    public void SignRefreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+
+        String refreshToken = jwtUtil.getRefreshTokenFromCookies(request);
+        String tokenValue = jwtUtil.getTokenFromCookie(request);
+        refreshToken = jwtUtil.substringToken(refreshToken);
+        tokenValue = jwtUtil.substringToken(tokenValue);
+
+        if (StringUtils.hasText(tokenValue)) {
+            if (!jwtUtil.validateToken(tokenValue)) {
+                if (refreshToken != null && jwtUtil.validateToken(refreshToken)) {
+                    String username = jwtUtil.getUserInfoFromToken(refreshToken).getSubject();
+                    String newAccessToken = jwtUtil.createToken(username);
+
+                    newAccessToken = URLEncoder.encode(newAccessToken, "utf-8")
+                            .replaceAll("\\+", "%20");
+                    Cookie cookie = new Cookie("AccessToken", newAccessToken);
+                    cookie.setPath("/");
+                    response.addCookie(cookie);
+                }
+                return;
+            }
+            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+            try {
+                jwtUtil.setAuthentication(info.getSubject());
+            } catch (Exception e) {
+                log.error(e.getMessage());
+            }
+        }
+    }
+
+    @Transactional
+    public UserResponseDto getTokenInfo(HttpServletRequest request, HttpServletResponse response) {
+        String tokenValue = jwtUtil.getTokenFromCookie(request);
+        tokenValue = jwtUtil.substringToken(tokenValue);
+
+        if (jwtUtil.validateToken(tokenValue)) {
+            Claims claims = jwtUtil.getUserInfoFromToken(tokenValue);
+            String nickname = claims.getSubject();
+
+            Optional<User> optionalUser = userRepository.findByEmail(nickname);
+            if (optionalUser.isPresent()) {
+                User user = optionalUser.get();
+                UserResponseDto userResponseDto = new UserResponseDto(user.getNickname(), user.getEmail());
+                return userResponseDto;
+            }
+        } else {
+            return null;
+        }
+
+        return null;
     }
 }

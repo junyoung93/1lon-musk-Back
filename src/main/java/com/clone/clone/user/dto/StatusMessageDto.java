@@ -5,7 +5,7 @@ import lombok.Getter;
 import java.time.LocalDateTime;
 
 @Getter
-public class StatusMessageDto{
+public class StatusMessageDto {
 
     private LocalDateTime timestamp;
     private int status;

@@ -22,7 +22,7 @@ public class User extends Timestamped {
     private Long id;
 
     @Column(nullable = false, unique = true)
-    private String username;
+    private String nickname;
 
     @Size(min = 8)
     @Column(nullable = false)
@@ -32,12 +32,12 @@ public class User extends Timestamped {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "marketing", nullable = false)
+    @Column(nullable = false)
     private boolean marketing;
 
 
-    public User(String username, String password, String email, boolean marketing) {
-        this.username = username;
+    public User(String nickname, String password, String email, boolean marketing) {
+        this.nickname = nickname;
         this.password = password;
         this.email = email;
         this.marketing = marketing;

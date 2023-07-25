@@ -2,6 +2,7 @@ package com.clone.clone.user;
 
 import com.clone.clone.security.ExceptionHandler.SignExeption;
 import com.clone.clone.security.dto.LoginRequestDto;
+import com.clone.clone.security.dto.SignResponseDto;
 import com.clone.clone.security.dto.SignupRequestDto;
 import com.clone.clone.security.dto.ToekenResponseDto;
 import com.clone.clone.security.jwt.JwtUtil;
@@ -10,6 +11,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.validator.routines.EmailValidator;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -75,7 +77,7 @@ public class UserService {
     }
 
     @Transactional
-    public ResponseEntity<?> signin(LoginRequestDto requestDto, HttpServletResponse response){
+    public SignResponseDto signin(LoginRequestDto requestDto){
         String email =requestDto.getEmail();
         String passowrd = requestDto.getPassword();
 
@@ -89,12 +91,7 @@ public class UserService {
             throw new IllegalArgumentException("비밀번호 불일치");
         }
 
-        //Jwt 생성 및 바디로 전송할 Response 객체로 추가
-        String token = jwtUtil.createToken(email);
-
-        // 처음에 여기서 json으로 응답이 가지 않고 바로 클라이언트로 갔음.
-        // 그래서 응답 본문에 넣고 싶어 JwtAuthenticationFilter의 successfulAuthentication를 수정함.
-        return jwtUtil.addJwtBody(token,response);
+        return new SignResponseDto(HttpStatus.OK.value());
     }
 
 

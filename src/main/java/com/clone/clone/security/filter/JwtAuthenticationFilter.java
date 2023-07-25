@@ -3,8 +3,10 @@ package com.clone.clone.security.filter;
 import com.clone.clone.security.ExceptionHandler.LoginFailHandler;
 import com.clone.clone.security.UserDetailsImpl;
 import com.clone.clone.security.dto.LoginRequestDto;
+import com.clone.clone.security.dto.SignResponseDto;
 import com.clone.clone.security.dto.ToekenResponseDto;
 import com.clone.clone.security.jwt.JwtUtil;
+import com.clone.clone.user.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -67,24 +69,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         }
     }
 
-    // 성공한 경우 처리 -> body에 토큰을 담아 날림
+//     성공한 경우 처리 -> body에 토큰을 담아 날림
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         String token = jwtUtil.createToken(username);
         token = jwtUtil.substringToken(token);
+        jwtUtil.addAccessTokenCookie(token,response);
 
         String refreshToken = jwtUtil.createRefreshToken();
         jwtUtil.addRefreshTokenCookie(refreshToken, response);
-
         log.info("로그인 성공!!");
-
-        //ToekenResponseDto 객체를 생성하고, 이 객체를 JSON 문자열로 변환한 다음, 이 JSON 문자열을 HTTP 응답 바디에 씁니다.
-        //ObjectMapper().writeValueAsString 메소드는 객체를 JSON 문자열로 변환하고,
-        //response.getWriter().write() 메소드는 이 JSON 문자열을 HTTP 응답 바디에 씁니다.
-        response.getWriter().write(new ObjectMapper().writeValueAsString(new ToekenResponseDto(token)));
-        response.setContentType("application/json");        //application/json 타입으로
-        response.setStatus(HttpServletResponse.SC_OK);      //응답 바디 json으로
     }
 }

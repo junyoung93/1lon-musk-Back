@@ -1,6 +1,7 @@
 package com.clone.clone.user;
 
 import com.clone.clone.security.dto.LoginRequestDto;
+import com.clone.clone.security.dto.SignResponseDto;
 import com.clone.clone.security.dto.SignupRequestDto;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -25,8 +26,8 @@ public class UserController {
     }
 
     @PostMapping("/signin")
-    public ResponseEntity<?> signin(@RequestBody LoginRequestDto loginRequestDto, HttpServletResponse res){
-        return userService.signin(loginRequestDto,res);
+    public SignResponseDto signin(@RequestBody LoginRequestDto loginRequestDto){
+        return userService.signin(loginRequestDto);
     }
 
 

@@ -116,6 +116,22 @@ public class JwtUtil {
         }
     }
 
+    public void addAccessTokenCookie(String token, HttpServletResponse res){
+        try {
+            token =  URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
+
+            //쿠키 생성
+            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
+            log.info("access 토큰 쿠키에 저장");
+
+            //쿠키 유효 경로 설정
+            cookie.setPath("/");
+            res.addCookie(cookie);
+
+        } catch (UnsupportedEncodingException e){
+            log.error(e.getMessage());
+        }
+    }
 
     //토큰을 body에 저장
     public ResponseEntity<ToekenResponseDto> addJwtBody(String token, HttpServletResponse response){

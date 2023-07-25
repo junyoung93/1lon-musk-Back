@@ -1,5 +1,7 @@
 package com.clone.clone.security.jwt;
 
+import com.clone.clone.exception.CustomException;
+import com.clone.clone.exception.ErrorCode;
 import com.clone.clone.security.impl.UserDetailsServiceImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
@@ -47,7 +49,7 @@ public class JwtUtil {
     long sec = 1000L;
     long minute = 60 * 1000L;
     //accesToken 생명 주기
-    private final long ACCESSTOKEN_TIME = 10 * minute;
+    private final long ACCESSTOKEN_TIME = 10*minute;
     long hour = 60 * minute;
     //refreshToken 생명 주기
     private final long REFRESHTOKEN_TIME = hour;
@@ -98,7 +100,7 @@ public class JwtUtil {
             res.addCookie(cookie);
 
         } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage());
+            new CustomException(ErrorCode.TOKEN_ERROR);
         }
     }
 
@@ -115,7 +117,7 @@ public class JwtUtil {
             res.addCookie(cookie);
 
         } catch (UnsupportedEncodingException e) {
-            log.error(e.getMessage());
+            new CustomException(ErrorCode.TOKEN_ERROR);
         }
     }
 
@@ -134,7 +136,7 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            logger.error("Invalid JWT signature, 유효하지 않는 JWT 서명 입니다.");
+            throw new CustomException(ErrorCode.NOT_FOUND_USER);
         } catch (ExpiredJwtException e) {
             logger.error("Expired JWT token, 만료된 JWT token 입니다.");
         } catch (UnsupportedJwtException e) {

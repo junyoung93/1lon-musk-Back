@@ -30,7 +30,8 @@ public class UserController {
 
     //로그인
     @GetMapping("/refreshToken")
-    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    public ResponseEntity<?> refresh(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
         userService.SignRefreshToken(request, response);
         return ResponseEntity.ok().build();
     }

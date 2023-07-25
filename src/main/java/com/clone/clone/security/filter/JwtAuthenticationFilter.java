@@ -1,15 +1,19 @@
 package com.clone.clone.security.filter;
 
-import com.clone.clone.security.ExceptionHandler.LoginFailHandler;
+import com.clone.clone.exception.CustomException;
+import com.clone.clone.exception.ErrorCode;
 import com.clone.clone.security.impl.UserDetailsImpl;
 import com.clone.clone.security.jwt.JwtUtil;
 import com.clone.clone.user.dto.LoginRequestDto;
+import com.clone.clone.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -25,7 +29,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(JwtUtil jwtUtil) {
         this.jwtUtil = jwtUtil;
         setFilterProcessesUrl("/api/user/signin");   //필터가 처리할 요청 URL을 "/signin"으로 설정
-        setAuthenticationFailureHandler(new LoginFailHandler());
     }
 
     //로그인 시도
@@ -49,10 +52,40 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             null
                     )
             );
+        } catch (BadCredentialsException e){
+            String jsonErrorMessage = "{\"status\": 400, \"message\": \"Wrong email or password format\"}";
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized status
+            try {
+                response.getWriter().write(jsonErrorMessage);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            // 이 경우에는 인증을 시도하지 않았으므로, null을 반환
+            return null;
+
+        } catch (AuthenticationException e){
+            String jsonErrorMessage = "{\"status\": 400, \"message\": \"User not found\"}";
+
+            response.setContentType("application/json");
+            response.setCharacterEncoding("UTF-8");
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized status
+            try {
+                response.getWriter().write(jsonErrorMessage);
+            } catch (IOException ex) {
+                throw new RuntimeException(ex);
+            }
+
+            // 이 경우에는 인증을 시도하지 않았으므로, null을 반환
+            return null;
         } catch (IOException e) {
             log.error(e.getMessage());
             throw new RuntimeException(e.getMessage());
         }
+
     }
 
     //성공한 경우 처리 -> body에 토큰을 담아 날림
@@ -66,6 +99,14 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         String refreshToken = jwtUtil.createRefreshToken();
         jwtUtil.addRefreshTokenCookie(refreshToken, response);
+
+        // JSON 형식으로 응답을 작성합니다.
+        String jsonBody = "{\"status\":200}";
+
+        // HTTP 응답 본문에 JSON을 설정합니다.
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonBody);
 
 
     }

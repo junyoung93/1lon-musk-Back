@@ -98,7 +98,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = jwtUtil.createRefreshToken();
         jwtUtil.addRefreshTokenCookie(refreshToken, response);
 
-        // JSON 형식으로 응답을 작성합니다.
+        // JSON 형식으로 응답을 작성합니다. 메일과 닉네임 
         String jsonBody = String.format("{\"email\":\"%s\", \"nickname\":\"%s\"}", email, nickname);
 
         // HTTP 응답 본문에 JSON을 설정합니다.

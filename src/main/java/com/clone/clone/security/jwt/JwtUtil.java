@@ -111,6 +111,7 @@ public class JwtUtil {
             cookie.setSecure(true);
             cookie.setPath("/");
             cookie.setMaxAge(3600);
+            cookie.setAttribute("SameSite", "None");
             response.addCookie(cookie);
             //쿠키 유효 경로 설정
 
@@ -138,6 +139,7 @@ public class JwtUtil {
             cookie.setSecure(true);
             cookie.setPath("/");
             cookie.setMaxAge(3600);
+            cookie.setAttribute("SameSite", "None");
             response.addCookie(cookie);
         } catch (UnsupportedEncodingException e) {
             new CustomException(ErrorCode.TOKEN_ERROR);

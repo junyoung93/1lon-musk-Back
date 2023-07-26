@@ -1,4 +1,4 @@
-package com.clone.clone.user.requestdto;
+package com.clone.clone.user.dto;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @RequiredArgsConstructor
-public class PwdForgotRequestDto {
-    private String email;
+public class PwdResetRequestDto {
+    private String password;
 
 }

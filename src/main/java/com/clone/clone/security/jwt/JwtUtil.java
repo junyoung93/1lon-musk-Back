@@ -48,11 +48,12 @@ public class JwtUtil {
     // 토큰 만료시간
     long sec = 1000L;
     long minute = 60 * 1000L;
-    //accesToken 생명 주기
+    //accessToken 생명 주기
     private final long ACCESSTOKEN_TIME = 20*minute;
     long hour = 60 * minute;
     //refreshToken 생명 주기
     private final long REFRESHTOKEN_TIME = hour;
+
     @Value("${jwt.secret.key}")
 
     private String secretKey;

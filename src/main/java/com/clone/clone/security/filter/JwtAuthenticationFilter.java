@@ -88,15 +88,18 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain
             , Authentication authResult) throws IOException, ServletException {
         log.info("로그인 성공 및 JWT 생성");
+        UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
+        String email = userDetails.getUsername();
+        String nickname = userDetails.getNickname();
         String token = jwtUtil.createToken(username);
         jwtUtil.addAccessTokenCookie(token, response);
 
         String refreshToken = jwtUtil.createRefreshToken();
         jwtUtil.addRefreshTokenCookie(refreshToken, response);
 
-        // JSON 형식으로 응답을 작성합니다.
-        String jsonBody = "{\"status\":200}";
+        // JSON 형식으로 응답을 작성합니다. 메일과 닉네임 
+        String jsonBody = String.format("{\"email\":\"%s\", \"nickname\":\"%s\"}", email, nickname);
 
         // HTTP 응답 본문에 JSON을 설정합니다.
         response.setContentType("application/json");

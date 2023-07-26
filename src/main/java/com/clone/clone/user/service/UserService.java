@@ -176,7 +176,7 @@ public class UserService {
         byte[] userEncoded = reqEmail.getBytes(StandardCharsets.UTF_8);
         String utf8EncodedString = new String(userEncoded, StandardCharsets.UTF_8);
 
-        String userLink = "https://hh99-clone-team1.vercel.app/pwdReset?token=" + utf8EncodedString;
+        String userLink = "https://hh99-clone-team1.vercel.app/newPassword?token=" + utf8EncodedString;
         sendEmail(reqEmail,"비밀번호 변경 링크 발송",userLink);
 
         return new PwdForgotResponseDto(HttpStatus.OK.value());

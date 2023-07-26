@@ -92,7 +92,6 @@ public class UserService {
         String refreshToken = jwtUtil.createRefreshToken();
         jwtUtil.addRefreshTokenCookie(refreshToken, response);
 
-        //Jackson에 의해 자동으로 json형태로 나감.
         return new SignResponseDto(HttpStatus.OK.value());
     }
 

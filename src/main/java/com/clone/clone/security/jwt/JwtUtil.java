@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -74,6 +76,7 @@ public class JwtUtil {
                         .setExpiration(new Date(date.getTime() + ACCESSTOKEN_TIME))
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm)
+
                         .compact();     //마무리
     }
 
@@ -89,16 +92,27 @@ public class JwtUtil {
     }
 
     // RefreshToken을 토큰 쿠키에 저장
-    public void addRefreshTokenCookie(String token, HttpServletResponse res) {
+    public void addRefreshTokenCookie(String token, HttpServletResponse response) {
         try {
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
 
             //쿠키 생성
-            Cookie cookie = new Cookie(REFRESH_HEADER, token);
+//            ResponseCookie cookie = ResponseCookie.from("RefreshToken", token)
+//                    .httpOnly(true)
+//                    .secure(true)
+//                    .path("/")
+//                    .maxAge(360)
+//                    .sameSite("None") // Available from Spring 5.2.3+
+//                    .build();
+//            response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
 
-            //쿠키 유효 경로 설정
+            Cookie cookie = new Cookie("RefreshToken", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
             cookie.setPath("/");
-            res.addCookie(cookie);
+            cookie.setMaxAge(3600);
+            response.addCookie(cookie);
+            //쿠키 유효 경로 설정
 
         } catch (UnsupportedEncodingException e) {
             new CustomException(ErrorCode.TOKEN_ERROR);
@@ -106,17 +120,25 @@ public class JwtUtil {
     }
 
     //AccessToken을 쿠키에 저장
-    public void addAccessTokenCookie(String token, HttpServletResponse res) {
+    public void addAccessTokenCookie(String token, HttpServletResponse response) {
         try {
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
 
             //쿠키 생성
-            Cookie cookie = new Cookie(AUTHORIZATION_HEADER, token);
-
-            //쿠키 유효 경로 설정
+//            ResponseCookie cookie = ResponseCookie.from("AccessToken", token)
+//                    .httpOnly(true)
+//                    .secure(true)
+//                    .path("/")
+//                    .maxAge(3600)
+//                    .sameSite("None") // Available from Spring 5.2.3+
+//                    .build();
+//            response.setHeader(HttpHeaders.SET_COOKIE2, cookie.toString());
+            Cookie cookie = new Cookie("AccessToken", token);
+            cookie.setHttpOnly(true);
+            cookie.setSecure(true);
             cookie.setPath("/");
-            res.addCookie(cookie);
-
+            cookie.setMaxAge(3600);
+            response.addCookie(cookie);
         } catch (UnsupportedEncodingException e) {
             new CustomException(ErrorCode.TOKEN_ERROR);
         }

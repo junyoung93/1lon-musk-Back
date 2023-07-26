@@ -92,6 +92,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         String email = userDetails.getUsername();
         String nickname = userDetails.getNickname();
+
         String token = jwtUtil.createToken(username);
         jwtUtil.addAccessTokenCookie(token, response);
 

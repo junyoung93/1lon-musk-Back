@@ -49,7 +49,7 @@ public class JwtUtil {
     long sec = 1000L;
     long minute = 60 * 1000L;
     //accesToken 생명 주기
-    private final long ACCESSTOKEN_TIME = 10*minute;
+    private final long ACCESSTOKEN_TIME = 5*sec;
     long hour = 60 * minute;
     //refreshToken 생명 주기
     private final long REFRESHTOKEN_TIME = hour;
@@ -136,9 +136,9 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (SecurityException | MalformedJwtException | SignatureException e) {
-            throw new CustomException(ErrorCode.NOT_FOUND_USER);
+            new CustomException(ErrorCode.NOT_FOUND_USER);
         } catch (ExpiredJwtException e) {
-            logger.error("Expired JWT token, 만료된 JWT token 입니다.");
+            new CustomException(ErrorCode.EXPIRED_TOKEN);
         } catch (UnsupportedJwtException e) {
             logger.error("Unsupported JWT token, 지원되지 않는 JWT 토큰 입니다.");
         } catch (IllegalArgumentException e) {
@@ -155,9 +155,11 @@ public class JwtUtil {
     //쿠키에서 토큰을 추출
     public String getTokenFromCookie(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("AccessToken")) { // 쿠키 이름에 따라 변경
-                return cookie.getValue();
+        if (cookies!=null){
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals("AccessToken")) { // 쿠키 이름에 따라 변경
+                    return cookie.getValue();
+                }
             }
         }
         return null;
@@ -168,7 +170,7 @@ public class JwtUtil {
         Cookie[] cookies = request.getCookies();
         if (cookies != null) {
             for (Cookie cookie : cookies) {
-                if ("RefreshToken".equals(cookie.getName())) {
+                if (cookie.getName().equals("RefreshToken")) {
                     return cookie.getValue();
                 }
             }

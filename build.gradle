@@ -22,27 +22,23 @@ repositories {
 }
 
 dependencies {
-	// web 추가 및  security 추가
-	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-
+	implementation 'org.springframework.boot:spring-boot-starter-web'
 	// javamailsender : 메일 보낼 때 사용
 	implementation 'org.springframework.boot:spring-boot-starter-mail'
 	// jsoup : html 파싱할 때 -> 크롤링
 	implementation 'org.jsoup:jsoup:1.14.3'
 	implementation 'org.springframework.boot:spring-boot-starter-thymeleaf'
-	implementation 'org.webjars.npm:jsonwebtoken:8.5.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 
-	//validation
+	//security 추가
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-
-	// JWT
+	implementation 'org.webjars.npm:jsonwebtoken:8.5.1'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	compileOnly group: 'io.jsonwebtoken', name: 'jjwt-api', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-impl', version: '0.11.5'
 	runtimeOnly group: 'io.jsonwebtoken', name: 'jjwt-jackson', version: '0.11.5'

@@ -9,6 +9,7 @@ import com.clone.clone.user.dto.UserResponseDto;
 import com.clone.clone.user.entity.User;
 import com.clone.clone.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -69,7 +70,7 @@ public class UserService {
         String token = jwtUtil.createToken(email);
         jwtUtil.addAccessTokenCookie(token, response);
 
-        if(token==null || token.isEmpty()){
+        if (token == null || token.isEmpty()) {
             throw new CustomException(ErrorCode.TOKEN_ERROR);
         }
 
@@ -89,24 +90,37 @@ public class UserService {
         refreshToken = jwtUtil.substringToken(refreshToken);
         tokenValue = jwtUtil.substringToken(tokenValue);
 
-
         if (StringUtils.hasText(tokenValue)) {
+
             if (!jwtUtil.validateToken(tokenValue)) {
                 if (refreshToken != null && jwtUtil.validateToken(refreshToken)) {
                     String username = jwtUtil.getUserInfoFromToken(refreshToken).getSubject();
                     String newAccessToken = jwtUtil.createToken(username);
                     newAccessToken = URLEncoder.encode(newAccessToken, "utf-8")
                             .replaceAll("\\+", "%20");
+
                     Cookie cookie = new Cookie("AccessToken", newAccessToken);
                     cookie.setPath("/");
                     response.addCookie(cookie);
+
+                    return;
                 }
             }
-            Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
+
             try {
+                Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
                 jwtUtil.setAuthentication(info.getSubject());
-            } catch (Exception e) {
-                throw new CustomException(ErrorCode.EXPIRED_TOKEN);
+            }catch (ExpiredJwtException e){
+                String jsonErrorMessage = "{\"status\": 401, \"message\": \"Authentication token expired\"}";
+                response.setContentType("application/json");
+                response.setCharacterEncoding("UTF-8");
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                try {
+                    response.getWriter().write(jsonErrorMessage);
+                } catch (IOException ex) {
+                    throw new RuntimeException(ex);
+                }
+                new CustomException(ErrorCode.EXPIRED_TOKEN);
             }
         }
     }
@@ -130,7 +144,6 @@ public class UserService {
         } else {
             new CustomException(ErrorCode.NOT_FOUND_USER);
         }
-
         return null;
     }
 }

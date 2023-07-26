@@ -1,18 +1,14 @@
 package com.clone.clone.security.filter;
 
-import com.clone.clone.exception.CustomException;
-import com.clone.clone.exception.ErrorCode;
 import com.clone.clone.security.impl.UserDetailsImpl;
 import com.clone.clone.security.jwt.JwtUtil;
 import com.clone.clone.user.dto.LoginRequestDto;
-import com.clone.clone.user.repository.UserRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -52,7 +48,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
                             null
                     )
             );
-        } catch (BadCredentialsException e){
+        } catch (BadCredentialsException e) {
             String jsonErrorMessage = "{\"status\": 400, \"message\": \"Wrong email or password format\"}";
 
             response.setContentType("application/json");
@@ -67,9 +63,8 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             // 이 경우에는 인증을 시도하지 않았으므로, null을 반환
             return null;
 
-        } catch (AuthenticationException e){
+        } catch (AuthenticationException e) {
             String jsonErrorMessage = "{\"status\": 400, \"message\": \"User not found\"}";
-
             response.setContentType("application/json");
             response.setCharacterEncoding("UTF-8");
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401 Unauthorized status

@@ -1,47 +1,41 @@
-package com.clone.clone.search;
+package com.clone.clone.search.service;
 
-import com.clone.clone.article.Article;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+
+import com.clone.clone.article.dto.ArticleListResponseDto;
+import com.clone.clone.article.entity.Article;
+import com.clone.clone.article.repository.ArticleRepository;
+import com.clone.clone.exception.CustomException;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@RestController
+import static com.clone.clone.exception.ErrorCode.OUT_OF_RANGE;
+
+@Service
 @RequiredArgsConstructor
-@Slf4j
-public class SearchController {
+public class SearchService {
 
     private final ArticleRepository articleRepository;
 
-
-    @GetMapping("/search")
-    public ResponseEntity search(@RequestParam(name = "q") String title,@RequestParam(name = "page") Integer page, HttpServletRequest request){
-        log.error(String.valueOf(request.getRequestURL()));
+    public Page<ArticleListResponseDto> search(String title, Integer size , Integer page) {
         if(page < 1)
-            return new ResponseEntity<>("페이지는 1부터 !",HttpStatus.BAD_REQUEST);
+            throw new CustomException(OUT_OF_RANGE);
+        Pageable pageable = PageRequest.of(page-1, size, Sort.by("id").descending());
 
-        Pageable pageable = PageRequest.of(page-1, 12,Sort.by("id").descending());
-        return new ResponseEntity<>(articleRepository.findByTitle(title,pageable),HttpStatusCode.valueOf(201));
+        String searchWord =  title.replaceAll("[^a-zA-Z0-9]", "");
+
+        return  articleRepository.findByTitleOrContentContaining(searchWord,pageable).map(ArticleListResponseDto::new);
     }
 
-    @GetMapping("/search2")
-    public ResponseEntity search2( HttpServletRequest request){
-        log.error(String.valueOf(request.getRequestURL()));
-
+    public List<String> RecommendedKeyword() {
         List<Article> recentArticles = articleRepository.findTop20ByOrderByIdDesc();
         Map<String, Integer> wordCounts = new HashMap<>();
 
@@ -74,6 +68,6 @@ public class SearchController {
                 break;
             }
         }
-        return new ResponseEntity<>(duplicatedWords,HttpStatusCode.valueOf(201));
+        return duplicatedWords;
     }
 }

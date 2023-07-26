@@ -26,6 +26,12 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### application.properties - security ###
+
+**/application.properties
+
+
+
 ### NetBeans ###
 /nbproject/private/
 /nbbuild/

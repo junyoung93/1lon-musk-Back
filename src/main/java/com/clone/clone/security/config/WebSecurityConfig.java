@@ -45,8 +45,7 @@ public class WebSecurityConfig {
         //csrf 사용 안함. RESTful api에서는 사용하지 않아도 되며 성능 면에서 사용 안함
         http.csrf((csrf) -> csrf.disable());
 
-        http.cors()
-                .configurationSource(corsConfigurationSource());
+        http.cors();
 
         // HTTP 요청에 대한 접근 제어를 설정
         http.authorizeHttpRequests((authorizeHttpRequests) ->        //람다식 표현 -> http 요청에 대한 접근 제어를 설정.

@@ -1,8 +1,6 @@
 package com.clone.clone.user.controller;
 
-import com.clone.clone.user.dto.SignResponseDto;
-import com.clone.clone.user.dto.SignupRequestDto;
-import com.clone.clone.user.dto.UserResponseDto;
+import com.clone.clone.user.dto.*;
 import com.clone.clone.user.service.UserService;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,14 +14,13 @@ import java.io.IOException;
 
 @RestController
 @RequiredArgsConstructor
-
 public class UserController {
 
     private final UserService userService;
 
     //회원가입
     @ResponseBody
-    @PostMapping("/api/user/signup")
+    @PostMapping("api/user/signup")
     public SignResponseDto signup(@RequestBody @Valid SignupRequestDto signupRequestDto, HttpServletResponse response) {
         return userService.signup(signupRequestDto, response);
     }
@@ -37,8 +34,21 @@ public class UserController {
     }
 
     // token 별 별 email, nickname
-    @GetMapping("/api/user/token")
+    @GetMapping("api/user/token")
     public UserResponseDto getTokenInfo(HttpServletRequest request, HttpServletResponse response) {
         return userService.getTokenInfo(request, response);
+    }
+
+    @GetMapping("api/pwd/forgot")
+    public PwdForgotResponseDto pwdForgot(@RequestBody PwdForgotRequestDto pwdForgotRequestDto){
+        return userService.pwdForgot(pwdForgotRequestDto);
+    }
+
+    @GetMapping("api/pwd/newPassword")
+    public PwdForgotResponseDto pwdForgot(
+            @RequestParam String token,
+            @RequestBody PwdResetRequestDto pwdResetRequestDto
+    ){
+        return userService.pwdReset(token, pwdResetRequestDto);
     }
 }

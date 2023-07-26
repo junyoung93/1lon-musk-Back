@@ -5,11 +5,11 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class ToekenResponseDto {
+public class TokenResponseDto {
     private String accessToken;
 
     //토큰을 body에 반환하기 위해 만들었음. 보안에 의심이 감
-    public ToekenResponseDto(String accessToken) {
+    public TokenResponseDto(String accessToken) {
         this.accessToken = accessToken;
     }
 

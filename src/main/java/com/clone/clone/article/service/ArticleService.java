@@ -44,7 +44,7 @@ public class ArticleService {
     //상세 페이지
     public ArticleResponseDto getArticle(Long articleId) {
 
-        return new ArticleResponseDto(articleRepository.findById(articleId).orElseThrow(() -> new CustomException(PAGE_NOT_EXITST)));
+        return new ArticleResponseDto(articleRepository.findById(articleId).orElseThrow(() -> new CustomException(PAGE_NOT_EXIST)));
     }
 
     // 카테고리로 조회
@@ -55,7 +55,7 @@ public class ArticleService {
 
         boolean categoryExists = Arrays.stream(categorys).anyMatch(category::equals);
         if(!categoryExists) {
-            throw new CustomException(CATEGORY_NOT_EXITST);
+            throw new CustomException(CATEGORY_NOT_EXIST);
         }
 
         Pageable pageable = PageRequest.of(page, size);

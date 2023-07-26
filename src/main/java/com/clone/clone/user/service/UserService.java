@@ -3,9 +3,7 @@ package com.clone.clone.user.service;
 import com.clone.clone.exception.CustomException;
 import com.clone.clone.exception.ErrorCode;
 import com.clone.clone.security.jwt.JwtUtil;
-import com.clone.clone.user.dto.SignResponseDto;
-import com.clone.clone.user.dto.SignupRequestDto;
-import com.clone.clone.user.dto.UserResponseDto;
+import com.clone.clone.user.dto.*;
 import com.clone.clone.user.entity.User;
 import com.clone.clone.user.repository.UserRepository;
 import io.jsonwebtoken.Claims;
@@ -17,7 +15,10 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 
 @Slf4j
@@ -37,6 +40,18 @@ public class UserService {
 
     private final JwtUtil jwtUtil;
 
+    @Autowired
+    private JavaMailSender mailSender;
+
+    public void sendEmail(String to, String subject, String body) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("dojunkim.devtest@outlook.com");
+        message.setTo(to);
+        message.setSubject(subject);
+        message.setText(body);
+
+        mailSender.send(message);
+    }
 
     //사용자로부터 회원 가입 요청 정보를 담은 DTO를 인자로 받아 처리합니다.
     @Transactional
@@ -83,7 +98,10 @@ public class UserService {
 
     //refresh token
     @Transactional
-    public void SignRefreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    public void SignRefreshToken(
+            HttpServletRequest request,
+            HttpServletResponse response
+    ) throws IOException, ServletException {
 
         String refreshToken = jwtUtil.getRefreshTokenFromCookies(request);
         String tokenValue = jwtUtil.getTokenFromCookie(request);
@@ -138,12 +156,46 @@ public class UserService {
             Optional<User> optionalUser = userRepository.findByEmail(nickname);
             if (optionalUser.isPresent()) {
                 User user = optionalUser.get();
-                UserResponseDto userResponseDto = new UserResponseDto(user.getNickname(), user.getEmail());
-                return userResponseDto;
+                return new UserResponseDto(user.getNickname(), user.getEmail());
             }
         } else {
             new CustomException(ErrorCode.NOT_FOUND_USER);
         }
         return null;
+    }
+
+    @Transactional
+    public PwdForgotResponseDto pwdForgot(PwdForgotRequestDto requestDto){
+        String reqEmail = requestDto.getEmail();
+        System.out.println(reqEmail);
+
+        User user = userRepository.findByEmail(reqEmail).orElseThrow(
+                () ->  new CustomException(ErrorCode.NOT_FOUND_USER)
+        );
+
+        byte[] userEncoded = reqEmail.getBytes(StandardCharsets.UTF_8);
+        String utf8EncodedString = new String(userEncoded, StandardCharsets.UTF_8);
+
+        String userLink = "https://hh99-clone-team1.vercel.app/pwdReset?token=" + utf8EncodedString;
+        sendEmail(reqEmail,"비밀번호 변경 링크 발송",userLink);
+
+        return new PwdForgotResponseDto(HttpStatus.OK.value());
+    }
+
+    @Transactional
+    public PwdForgotResponseDto pwdReset(String token,PwdResetRequestDto pwdResetRequestDto){
+
+        String password = pwdResetRequestDto.getPassword();
+
+        ByteBuffer decodedEmail = StandardCharsets.UTF_8.encode(token);
+        String utf8EncodedEmail = StandardCharsets.UTF_8.decode(decodedEmail).toString();
+
+        User user = userRepository.findByEmail(utf8EncodedEmail).orElseThrow(
+                ()-> new CustomException(ErrorCode.INVALID_EMAIL_PASSWORD)
+        );
+
+        user.setPassword(passwordEncoder.encode(password));
+
+        return new PwdForgotResponseDto(HttpStatus.OK.value());
     }
 }

@@ -159,6 +159,7 @@ public class JwtUtil {
         if (cookies!=null){
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("AccessToken")) { // 쿠키 이름에 따라 변경
+                    log.info(cookie.getValue());
                     return cookie.getValue();
                 }
             }
@@ -172,6 +173,7 @@ public class JwtUtil {
         if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("RefreshToken")) {
+                    log.info(cookie.getValue());
                     return cookie.getValue();
                 }
             }

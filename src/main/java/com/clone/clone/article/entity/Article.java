@@ -1,34 +1,33 @@
-package com.clone.clone.article;
-
+package com.clone.clone.article.entity;
 
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
-import java.time.LocalDateTime;
 
-@Entity
 @Getter
-@Setter
 @Table
 @NoArgsConstructor
+@Entity
+@Builder
+@AllArgsConstructor
 public class Article {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false,length = 5000)
     private String title;
-    @Column(nullable = false)
+    @Column(nullable = false,length = 10000)
     private String content;
     @Column(nullable = false)
     private String image_url;
     @Column(nullable = false)
     private String category;
     @Column(nullable = false)
-    private LocalDateTime articleDate;
-
+    private String date;
 
 }

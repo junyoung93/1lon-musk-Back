@@ -49,7 +49,7 @@ public class JwtUtil {
     long sec = 1000L;
     long minute = 60 * 1000L;
     //accesToken 생명 주기
-    private final long ACCESSTOKEN_TIME = 5*sec;
+    private final long ACCESSTOKEN_TIME = 20*minute;
     long hour = 60 * minute;
     //refreshToken 생명 주기
     private final long REFRESHTOKEN_TIME = hour;

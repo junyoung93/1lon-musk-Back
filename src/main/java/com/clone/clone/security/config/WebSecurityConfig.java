@@ -69,9 +69,9 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        config.addAllowedOrigin("*");
-//        config.addAllowedOrigin("http://localhost:3000");
-//        config.addAllowedOrigin("https://hh99-clone-team1.vercel.app/");
+//        config.addAllowedOriginPattern("*");
+        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin("https://hh99-clone-team1.vercel.app/");
         config.addAllowedMethod("GET");
         config.addAllowedMethod("POST");
         config.addAllowedMethod("PUT");

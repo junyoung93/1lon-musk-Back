@@ -30,7 +30,7 @@ public class SearchService {
             throw new CustomException(OUT_OF_RANGE);
         Pageable pageable = PageRequest.of(page-1, size, Sort.by("id").descending());
 
-        String searchWord =  title.replaceAll("[^a-zA-Z0-9]", "");
+        String searchWord =  title.replaceAll("[^a-zA-Z0-9가-힣]", "");
 
         return  articleRepository.findByTitleOrContentContaining(searchWord,pageable).map(ArticleListResponseDto::new);
     }

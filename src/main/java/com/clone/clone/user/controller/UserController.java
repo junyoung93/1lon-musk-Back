@@ -40,12 +40,12 @@ public class UserController {
         return userService.getTokenInfo(request, response);
     }
 
-    @GetMapping("api/pwd/forgot")
+    @PostMapping ("api/pwd/forgot")
     public PwdForgotResponseDto pwdForgot(@RequestBody PwdForgotRequestDto pwdForgotRequestDto) {
         return userService.pwdForgot(pwdForgotRequestDto);
     }
 
-    @GetMapping("api/pwd/newPassword")
+    @PostMapping("api/pwd/newPassword")
     public PwdForgotResponseDto pwdForgot(
             @RequestBody PwdResetRequestDto pwdResetRequestDto
     ) {

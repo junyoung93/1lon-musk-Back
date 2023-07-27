@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -50,5 +51,11 @@ public class UserController {
             @RequestBody PwdResetRequestDto pwdResetRequestDto
     ){
         return userService.pwdReset(token, pwdResetRequestDto);
+    }
+
+    @PostMapping("api/user/logout")
+    public LogoutResponseDto logout(HttpServletRequest request, HttpServletResponse response){
+       userService.logout(request,response);
+       return new LogoutResponseDto(HttpStatus.OK.value());
     }
 }

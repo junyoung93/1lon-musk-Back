@@ -14,8 +14,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContext;
@@ -35,11 +33,6 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtUtil {
 
-
-    public static final String AUTHORIZATION_HEADER = "AccessToken";
-
-    public static final String REFRESH_HEADER = "RefreshToken";
-
     // Token 식별자. 말그대로 JWT를 식별하는 접두사입니다
     public static final String BEARER_PREFIX = "Bearer ";  //bearer 규칙(공백 필수)
     public static final String COOKIE_PREFIX = "Bearer%20";
@@ -50,11 +43,10 @@ public class JwtUtil {
     // 토큰 만료시간
     long sec = 1000L;
     long minute = 60 * 1000L;
-    //accessToken 생명 주기
-    private final long ACCESSTOKEN_TIME = 20*minute;
+    private final long ACCESSTOKEN_TIME = 20 * minute;
     long hour = 60 * minute;
-    //refreshToken 생명 주기
     private final long REFRESHTOKEN_TIME = hour;
+
 
     @Value("${jwt.secret.key}")
 
@@ -68,11 +60,11 @@ public class JwtUtil {
     }
 
     //토큰 생성
-    public String createToken(String username) {
+    public String createToken(String email) {
         Date date = new Date();    //현재 날짜 시간
         return BEARER_PREFIX +
                 Jwts.builder()
-                        .setSubject(username)
+                        .setSubject(email)
                         .setExpiration(new Date(date.getTime() + ACCESSTOKEN_TIME))
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm)
@@ -95,17 +87,6 @@ public class JwtUtil {
     public void addRefreshTokenCookie(String token, HttpServletResponse response) {
         try {
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-
-            //쿠키 생성
-//            ResponseCookie cookie = ResponseCookie.from("RefreshToken", token)
-//                    .httpOnly(true)
-//                    .secure(true)
-//                    .path("/")
-//                    .maxAge(360)
-//                    .sameSite("None") // Available from Spring 5.2.3+
-//                    .build();
-//            response.setHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-
             Cookie cookie = new Cookie("RefreshToken", token);
             cookie.setHttpOnly(true);
             cookie.setSecure(true);
@@ -124,16 +105,6 @@ public class JwtUtil {
     public void addAccessTokenCookie(String token, HttpServletResponse response) {
         try {
             token = URLEncoder.encode(token, "utf-8").replaceAll("\\+", "%20");
-
-            //쿠키 생성
-//            ResponseCookie cookie = ResponseCookie.from("AccessToken", token)
-//                    .httpOnly(true)
-//                    .secure(true)
-//                    .path("/")
-//                    .maxAge(3600)
-//                    .sameSite("None") // Available from Spring 5.2.3+
-//                    .build();
-//            response.setHeader(HttpHeaders.SET_COOKIE2, cookie.toString());
             Cookie cookie = new Cookie("AccessToken", token);
             cookie.setHttpOnly(true);
             cookie.setSecure(true);
@@ -180,7 +151,7 @@ public class JwtUtil {
     //쿠키에서 토큰을 추출
     public String getTokenFromCookie(HttpServletRequest req) {
         Cookie[] cookies = req.getCookies();
-        if (cookies!=null){
+        if (cookies != null) {
             for (Cookie cookie : cookies) {
                 if (cookie.getName().equals("AccessToken")) { // 쿠키 이름에 따라 변경
                     log.info(cookie.getValue());

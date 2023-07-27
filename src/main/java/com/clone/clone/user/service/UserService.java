@@ -95,6 +95,23 @@ public class UserService {
         return new SignResponseDto(HttpStatus.OK.value());
     }
 
+    //로그아웃
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
+        //현재 플젝상 쿠키가 두개만 존재하므로 전체 삭젝.
+        //하지만 쿠키가 여러 개라면 골라서 삭제 해야함.
+            Cookie[] cookies = request.getCookies();
+            if(cookies!=null){
+                for(Cookie cookie : cookies){
+                    cookie.setHttpOnly(true);
+                    cookie.setSecure(true);
+                    cookie.setPath("/");
+                    cookie.setMaxAge(0);
+                    cookie.setAttribute("SameSite", "None");
+                    response.addCookie(cookie);
+                }
+            }
+    }
+
     //refresh token
     @Transactional
     public void SignRefreshToken(
@@ -197,4 +214,6 @@ public class UserService {
 
         return new PwdForgotResponseDto(HttpStatus.OK.value());
     }
+
+
 }

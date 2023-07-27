@@ -194,11 +194,10 @@ public class UserService {
     }
 
     @Transactional
-    public PwdForgotResponseDto pwdReset(PwdResetRequestDto pwdResetRequestDto) {
+    public PwdForgotResponseDto pwdReset(String token, PwdResetRequestDto pwdResetRequestDto) {
 
         String password = pwdResetRequestDto.getPassword();
-        String secretEmail = pwdResetRequestDto.getSecretemail();
-        byte[] decodedBytes = Base64.getDecoder().decode(secretEmail);
+        byte[] decodedBytes = Base64.getDecoder().decode(token);
         String reqEmail = new String(decodedBytes, StandardCharsets.UTF_8);
 
         User user = userRepository.findByEmail(reqEmail).orElseThrow(

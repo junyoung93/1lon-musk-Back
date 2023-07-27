@@ -9,7 +9,6 @@ import lombok.Setter;
 @RequiredArgsConstructor
 public class PwdResetRequestDto {
 
-    private String secretemail;
     private String password;
 
 }

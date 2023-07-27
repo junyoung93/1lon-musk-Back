@@ -37,9 +37,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-
     private final JwtUtil jwtUtil;
-
     @Autowired
     private JavaMailSender mailSender;
 
@@ -53,7 +51,7 @@ public class UserService {
         mailSender.send(message);
     }
 
-    //사용자로부터 회원 가입 요청 정보를 담은 DTO를 인자로 받아 처리합니다.
+    //회원 가입
     @Transactional
     public SignResponseDto signup(@Valid SignupRequestDto requestDto, HttpServletResponse response) {
         //정보 가져옴
@@ -99,17 +97,17 @@ public class UserService {
     public void logout(HttpServletRequest request, HttpServletResponse response) {
         //현재 플젝상 쿠키가 두개만 존재하므로 전체 삭젝.
         //하지만 쿠키가 여러 개라면 골라서 삭제 해야함.
-            Cookie[] cookies = request.getCookies();
-            if(cookies!=null){
-                for(Cookie cookie : cookies){
-                    cookie.setHttpOnly(true);
-                    cookie.setSecure(true);
-                    cookie.setPath("/");
-                    cookie.setMaxAge(0);
-                    cookie.setAttribute("SameSite", "None");
-                    response.addCookie(cookie);
-                }
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                cookie.setHttpOnly(true);
+                cookie.setSecure(true);
+                cookie.setPath("/");
+                cookie.setMaxAge(0);
+                cookie.setAttribute("SameSite", "None");
+                response.addCookie(cookie);
             }
+        }
     }
 
     //refresh token
@@ -144,7 +142,7 @@ public class UserService {
             try {
                 Claims info = jwtUtil.getUserInfoFromToken(tokenValue);
                 jwtUtil.setAuthentication(info.getSubject());
-            }catch (ExpiredJwtException e){
+            } catch (ExpiredJwtException e) {
                 String jsonErrorMessage = "{\"status\": 401, \"message\": \"Authentication token expired\"}";
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
@@ -181,25 +179,25 @@ public class UserService {
     }
 
     @Transactional
-    public PwdForgotResponseDto pwdForgot(PwdForgotRequestDto requestDto){
+    public PwdForgotResponseDto pwdForgot(PwdForgotRequestDto requestDto) {
         String reqEmail = requestDto.getEmail();
         System.out.println(reqEmail);
 
         User user = userRepository.findByEmail(reqEmail).orElseThrow(
-                () ->  new CustomException(ErrorCode.NOT_FOUND_USER)
+                () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
 
         byte[] userEncoded = reqEmail.getBytes(StandardCharsets.UTF_8);
         String utf8EncodedString = new String(userEncoded, StandardCharsets.UTF_8);
 
         String userLink = "https://hh99-clone-team1.vercel.app/newPassword?token=" + utf8EncodedString;
-        sendEmail(reqEmail,"비밀번호 변경 링크 발송",userLink);
+        sendEmail(reqEmail, "비밀번호 변경 링크 발송", userLink);
 
         return new PwdForgotResponseDto(HttpStatus.OK.value());
     }
 
     @Transactional
-    public PwdForgotResponseDto pwdReset(String token,PwdResetRequestDto pwdResetRequestDto){
+    public PwdForgotResponseDto pwdReset(String token, PwdResetRequestDto pwdResetRequestDto) {
 
         String password = pwdResetRequestDto.getPassword();
 
@@ -207,7 +205,7 @@ public class UserService {
         String utf8EncodedEmail = StandardCharsets.UTF_8.decode(decodedEmail).toString();
 
         User user = userRepository.findByEmail(utf8EncodedEmail).orElseThrow(
-                ()-> new CustomException(ErrorCode.INVALID_EMAIL_PASSWORD)
+                () -> new CustomException(ErrorCode.INVALID_EMAIL_PASSWORD)
         );
 
         user.setPassword(passwordEncoder.encode(password));

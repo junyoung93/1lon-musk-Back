@@ -14,11 +14,9 @@ import org.jsoup.select.Elements;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -34,7 +32,7 @@ public class ArticleService {
 
     //메인 페이지
     public Page<ArticleListResponseDto> getArticleList(Integer page, Integer size) {
-        if (page < 0){
+        if (page < 0) {
             throw new CustomException(OUT_OF_RANGE);
         }
         Pageable pageable = PageRequest.of(page, size);
@@ -49,12 +47,12 @@ public class ArticleService {
 
     // 카테고리로 조회
     public Page<ArticleListResponseDto> getCategoryArticleList(Integer page, Integer size, String category) {
-        if(page < 0 ){
+        if (page < 0) {
             throw new CustomException(OUT_OF_RANGE);
         }
 
         boolean categoryExists = Arrays.stream(categorys).anyMatch(category::equals);
-        if(!categoryExists) {
+        if (!categoryExists) {
             throw new CustomException(CATEGORY_NOT_EXIST);
         }
 

@@ -15,13 +15,12 @@ public class ArticleResponseDto {
     private String date;
 
 
-
-    public ArticleResponseDto(Article article){
-        this.id=article.getId();
-        this.title=article.getTitle();
-        this.content=article.getContent();
-        this.image_url=article.getImage_url();
-        this.category=article.getCategory();
-        this.date=article.getDate();
+    public ArticleResponseDto(Article article) {
+        this.id = article.getId();
+        this.title = article.getTitle();
+        this.content = article.getContent();
+        this.image_url = article.getImage_url();
+        this.category = article.getCategory();
+        this.date = article.getDate();
     }
 }

@@ -52,13 +52,6 @@ public class WebSecurityConfig {
                 authorizeHttpRequests
                         .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers("/**").permitAll()
-//                        .requestMatchers("/refreshToken").permitAll()
-//                        .requestMatchers("/api/user/signin").permitAll()
-//                        .requestMatchers("/keyword").permitAll()
-//                        .requestMatchers("/search").permitAll()
-//                        .requestMatchers("/api/user/signin").permitAll()
-//                        .requestMatchers("/api/user/signin").permitAll()
-
                         .anyRequest().authenticated()       //anyRequest:모든 요청에 대해 적용할 규칙 적용.
         );
         return http.build();    //HttpSecurity 객체를 빌드 하고 반환합니다.
@@ -69,7 +62,6 @@ public class WebSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-//        config.addAllowedOriginPattern("*");
         config.addAllowedOrigin("http://localhost:3000");
         config.addAllowedOrigin("https://hh99-clone-team1.vercel.app/");
         config.addAllowedMethod("GET");

@@ -68,7 +68,6 @@ public class JwtUtil {
                         .setExpiration(new Date(date.getTime() + ACCESSTOKEN_TIME))
                         .setIssuedAt(date) // 발급일
                         .signWith(key, signatureAlgorithm)
-
                         .compact();     //마무리
     }
 

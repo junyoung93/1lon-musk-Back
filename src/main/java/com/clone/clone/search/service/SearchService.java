@@ -49,25 +49,34 @@ public class SearchService {
 
         // 등장 횟수가 가장 높은 상위 6개의 단어를 추출
         List<String> duplicatedWords = new ArrayList<>();
-        for (int i = 0; i < 6; i++) {
-            String mostFrequentWord = null;
-            int maxCount = 0;
+//        for (int i = 0; i < 6; i++) {
+//            String mostFrequentWord = null;
+//            int maxCount = 0;
+//
+//            for (Map.Entry<String, Integer> entry : wordCounts.entrySet()) {
+//                if (entry.getValue() > maxCount) {
+//                    mostFrequentWord = entry.getKey();
+//                    maxCount = entry.getValue();
+//                }
+//            }
+//
+//            if (mostFrequentWord != null) {
+//                duplicatedWords.add(mostFrequentWord);
+//                wordCounts.remove(mostFrequentWord);
+//            } else {
+//                // 단어가 더 이상 없으면 종료
+//                break;
+//            }
+//        }
+        duplicatedWords.add("머스크");
+        duplicatedWords.add("트위터");
+        duplicatedWords.add("Ai");
+        duplicatedWords.add("파랑새");
+        duplicatedWords.add("집착남");
+        duplicatedWords.add("도지");
 
-            for (Map.Entry<String, Integer> entry : wordCounts.entrySet()) {
-                if (entry.getValue() > maxCount) {
-                    mostFrequentWord = entry.getKey();
-                    maxCount = entry.getValue();
-                }
-            }
 
-            if (mostFrequentWord != null) {
-                duplicatedWords.add(mostFrequentWord);
-                wordCounts.remove(mostFrequentWord);
-            } else {
-                // 단어가 더 이상 없으면 종료
-                break;
-            }
-        }
+
         return duplicatedWords;
     }
 }

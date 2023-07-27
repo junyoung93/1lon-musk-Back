@@ -7,6 +7,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -40,7 +41,7 @@ public class UserController {
     }
 
     @GetMapping("api/pwd/forgot")
-    public PwdForgotResponseDto pwdForgot(@RequestBody PwdForgotRequestDto pwdForgotRequestDto){
+    public PwdForgotResponseDto pwdForgot(@RequestBody PwdForgotRequestDto pwdForgotRequestDto) {
         return userService.pwdForgot(pwdForgotRequestDto);
     }
 
@@ -48,7 +49,13 @@ public class UserController {
     public PwdForgotResponseDto pwdForgot(
             @RequestParam String token,
             @RequestBody PwdResetRequestDto pwdResetRequestDto
-    ){
+    ) {
         return userService.pwdReset(token, pwdResetRequestDto);
+    }
+
+    @PostMapping("api/user/logout")
+    public LogoutResponseDto logout(HttpServletRequest request, HttpServletResponse response) {
+        userService.logout(request, response);
+        return new LogoutResponseDto(HttpStatus.OK.value());
     }
 }

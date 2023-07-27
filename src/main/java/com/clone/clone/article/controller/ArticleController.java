@@ -6,8 +6,6 @@ import com.clone.clone.article.dto.ArticleResponseDto;
 import com.clone.clone.article.service.ArticleService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.IOException;
@@ -26,18 +24,18 @@ public class ArticleController {
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "12") Integer size
     ) {
-        return articleService.getArticleList(page -1, size);
+        return articleService.getArticleList(page - 1, size);
     }
 
     //상세 페이지
     @GetMapping("/main/{id}")
-    public ArticleResponseDto getAricle(@PathVariable Long id) {
+    public ArticleResponseDto getArticle(@PathVariable Long id) {
         return articleService.getArticle(id);
     }
 
     // 카테고리로 조회
     @GetMapping("/tag")
-    public Page<ArticleListResponseDto> getCategoryAricleList(
+    public Page<ArticleListResponseDto> getCategoryArticleList(
             @RequestParam(value = "page", defaultValue = "1") Integer page,
             @RequestParam(value = "size", defaultValue = "12") Integer size,
             @RequestParam(value = "category", required = false) String category

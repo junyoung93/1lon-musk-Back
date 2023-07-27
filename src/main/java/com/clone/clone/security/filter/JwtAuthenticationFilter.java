@@ -59,8 +59,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-
-            // 이 경우에는 인증을 시도하지 않았으므로, null을 반환
             return null;
 
         } catch (AuthenticationException e) {
@@ -73,8 +71,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
             } catch (IOException ex) {
                 throw new RuntimeException(ex);
             }
-
-            // 이 경우에는 인증을 시도하지 않았으므로, null을 반환
             return null;
         } catch (IOException e) {
             log.error(e.getMessage());
@@ -87,7 +83,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain
             , Authentication authResult) throws IOException, ServletException {
-        log.info("로그인 성공 및 JWT 생성");
         UserDetailsImpl userDetails = (UserDetailsImpl) authResult.getPrincipal();
         String username = ((UserDetailsImpl) authResult.getPrincipal()).getUsername();
         String email = userDetails.getUsername();

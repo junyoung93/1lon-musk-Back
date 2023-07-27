@@ -28,7 +28,7 @@ import static com.clone.clone.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class ArticleService {
     private final ArticleRepository articleRepository;
-    private final String[] categorys = {"트위터", "테슬라", "페이팔", "스페이스x", "X.AI", "도지코인", "뉴럴링크", "하이퍼루프", "솔라시티", "스타링크"};
+    private final String[] categorys = {"트위터", "테슬라", "페이팔", "스페이스X", "XAI", "도지코인", "뉴럴링크", "하이퍼루프", "솔라시티", "스타링크"};
 
     //메인 페이지
     public Page<ArticleListResponseDto> getArticleList(Integer page, Integer size) {

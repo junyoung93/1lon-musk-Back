@@ -26,8 +26,8 @@ import org.springframework.util.StringUtils;
 
 import java.io.IOException;
 import java.net.URLEncoder;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
+import java.util.Base64;
 import java.util.Optional;
 
 @Slf4j
@@ -181,30 +181,27 @@ public class UserService {
     @Transactional
     public PwdForgotResponseDto pwdForgot(PwdForgotRequestDto requestDto) {
         String reqEmail = requestDto.getEmail();
-        System.out.println(reqEmail);
 
         User user = userRepository.findByEmail(reqEmail).orElseThrow(
                 () -> new CustomException(ErrorCode.NOT_FOUND_USER)
         );
-
-        byte[] userEncoded = reqEmail.getBytes(StandardCharsets.UTF_8);
-        String utf8EncodedString = new String(userEncoded, StandardCharsets.UTF_8);
-
-        String userLink = "https://hh99-clone-team1.vercel.app/newPassword?token=" + utf8EncodedString;
+        byte[] userEncoded = Base64.getEncoder().encode(user.getEmail().getBytes(StandardCharsets.UTF_8));
+        String encodedString = new String(userEncoded, StandardCharsets.UTF_8);
+        String userLink = "https://hh99-clone-team1.vercel.app/newPassword?token=" + encodedString;
         sendEmail(reqEmail, "비밀번호 변경 링크 발송", userLink);
 
         return new PwdForgotResponseDto(HttpStatus.OK.value());
     }
 
     @Transactional
-    public PwdForgotResponseDto pwdReset(String token, PwdResetRequestDto pwdResetRequestDto) {
+    public PwdForgotResponseDto pwdReset(PwdResetRequestDto pwdResetRequestDto) {
 
         String password = pwdResetRequestDto.getPassword();
+        String secretEmail = pwdResetRequestDto.getSecretemail();
+        byte[] decodedBytes = Base64.getDecoder().decode(secretEmail);
+        String reqEmail = new String(decodedBytes, StandardCharsets.UTF_8);
 
-        ByteBuffer decodedEmail = StandardCharsets.UTF_8.encode(token);
-        String utf8EncodedEmail = StandardCharsets.UTF_8.decode(decodedEmail).toString();
-
-        User user = userRepository.findByEmail(utf8EncodedEmail).orElseThrow(
+        User user = userRepository.findByEmail(reqEmail).orElseThrow(
                 () -> new CustomException(ErrorCode.INVALID_EMAIL_PASSWORD)
         );
 

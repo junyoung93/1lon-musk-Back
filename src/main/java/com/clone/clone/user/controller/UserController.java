@@ -47,10 +47,9 @@ public class UserController {
 
     @GetMapping("api/pwd/newPassword")
     public PwdForgotResponseDto pwdForgot(
-            @RequestParam String token,
             @RequestBody PwdResetRequestDto pwdResetRequestDto
     ) {
-        return userService.pwdReset(token, pwdResetRequestDto);
+        return userService.pwdReset(pwdResetRequestDto);
     }
 
     @PostMapping("api/user/logout")
